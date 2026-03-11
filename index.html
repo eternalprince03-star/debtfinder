@@ -15,21 +15,18 @@
 
     <main id="auth-view" class="view-container full-height">
         <div class="glass-card auth-card">
-            <h1 class="brand-title">Resolve Without Limits</h1>
-            <p class="subtitle">Securely track and mitigate your student debt.</p>
-            
+            <h1 class="brand-title">Resolve</h1>
             <div class="tabs">
                 <button class="tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
                 <button class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
             </div>
-
             <form id="auth-form">
                 <div class="form-group">
-                    <label for="email">Email Address</label>
+                    <label>Email Address</label>
                     <input type="email" id="email" required placeholder="you@university.edu">
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label>Password</label>
                     <input type="password" id="password" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn-luminous-primary" id="auth-btn">Log In</button>
@@ -40,66 +37,36 @@
     <main id="dashboard-view" class="view-container hidden">
         <header class="dashboard-header glass-panel">
             <h2 class="cyan-glow">Debt Intelligence</h2>
-            <button id="logout-btn" class="btn-luminous-secondary">Return to Sign In</button>
+            <button id="logout-btn" class="btn-luminous-secondary">Sign Out</button>
         </header>
-
+        
         <div class="dashboard-content">
-            <section class="full-bleed-title">
-                <h1>Manage Debt <span class="cyan">with Precision.</span></h1>
-            </section>
-
-            <section class="glass-card large-section" id="upload-section">
+            <section id="upload-section" class="glass-card">
                 <h3>1. Debt Documentation</h3>
-                <p class="text-luminous-muted">Upload your latest college financial records to start the analysis.</p>
-                <div class="upload-area">
-                    <input type="file" id="document-upload" accept=".pdf, .jpg, .png">
-                </div>
-                <div class="flex-end mt-2">
-                    <button id="analyze-btn" class="btn-luminous-primary" disabled>Analyze Records</button>
-                </div>
-                <div id="loading-spinner" class="hidden text-info luminous-glow">Parsing document metadata...</div>
+                <input type="file" id="document-upload">
+                <button id="analyze-btn" class="btn-luminous-primary" disabled>Analyze Records</button>
+                <div id="loading-spinner" class="hidden">Parsing...</div>
             </section>
 
-            <section class="glass-card hidden large-section" id="analysis-section">
+            <section id="analysis-section" class="glass-card hidden">
                 <h3>2. Financial Outlook</h3>
-                <div class="grid-2">
-                    <div class="metric-box glass-panel">
-                        <h4>Account Status</h4>
-                        <p id="debt-status" class="status-luminous-warning">Pending Analysis</p>
-                    </div>
-                    <div class="metric-box glass-panel">
-                        <h4>Total Principal</h4>
-                        <p id="debt-amount" class="big-number">$0.00</p>
-                    </div>
-                </div>
-                
-                <div class="prediction-box glass-panel">
-                    <h4>Future Interest Forecast</h4>
-                    <p class="text-luminous-muted">Projected growth based on standard compound interest rates.</p>
-                    <ul id="prediction-list" class="timeline-luminous">
-                        </ul>
-                </div>
+                <p id="debt-status"></p>
+                <p id="debt-amount"></p>
+                <ul id="prediction-list"></ul>
             </section>
 
-            <section class="glass-card hidden large-section" id="solutions-section">
+            <section id="solutions-section" class="glass-card hidden">
                 <h3>3. Resolution Roadmap</h3>
-                <p class="text-luminous-muted">Enter your current address to unlock location-based mitigation programs.</p>
-                
-                <form id="address-form" class="inline-form glass-panel">
-                    <input type="text" id="user-address" placeholder="Address, City, State, Zip" required>
-                    <button type="submit" class="btn-luminous-primary inline-btn">Save & Analyze</button>
+                <form id="address-form">
+                    <input type="text" id="user-address" required>
+                    <button type="submit">Save</button>
                 </form>
-
-                <div id="actionable-solutions" class="hidden mt-2">
-                    <h4 class="solutions-header">Mitigation Options</h4>
-                    <div id="solutions-list">
-                        </div>
+                <div id="actionable-solutions" class="hidden">
+                    <div id="solutions-list"></div>
                 </div>
             </section>
 
-            <div class="actions-footer">
-                <button id="clear-btn" class="btn-subtle-danger">Clear All Stored Records</button>
-            </div>
+            <button id="clear-btn" class="btn-subtle-danger">Clear Records</button>
         </div>
     </main>
 
