@@ -1,163 +1,261 @@
-/* --- High-Depth Design Variables --- */
+/* --- Advanced UI: Corporate Tech & Glassmorphism Mix --- */
 :root {
-    --bg-dark: #060e1f;
-    --bg-gradient: radial-gradient(circle at center, #0a1f43 0%, #060e1f 100%);
-    --primary-glow: #2563eb;
-    --primary-luminous: #3b82f6;
-    --text-main: #ffffff;
-    --text-cyan: #22d3ee;
-    --text-luminous-muted: #94a3b8;
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.05);
-    --danger-subtle: #991b1b;
-    --warning-luminous: #fbbf24;
-    --success-luminous: #10b981;
+    /* Color Palette from Screenshots */
+    --bg-dark-obsidian: #020617;
+    --primary-cyan: #0ea5e9;
+    --primary-blue: #2563eb;
+    --text-pure-white: #ffffff;
+    --text-slate: #94a3b8;
+    --glass-fill: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent-glow: rgba(14, 165, 233, 0.15);
+    
+    /* Functional Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- Base & Reset --- */
+/* --- Base & Scrollbar --- */
 * {
-    box-sizing: border-box; margin: 0; padding: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    letter-spacing: -0.01em;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    line-height: 1.5;
-    position: relative;
+    background-color: var(--bg-dark-obsidian);
+    color: var(--text-pure-white);
+    line-height: 1.6;
     overflow-x: hidden;
+    min-height: 100vh;
 }
 
-/* --- Dynamic Background --- */
+/* --- Background Orbs (Depth Layer) --- */
 .main-bg {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--bg-gradient); z-index: -2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 30%, #0f172a 0%, #020617 100%);
+    z-index: -2;
 }
 
-/* Decorative orbs inspired by image_0.png */
 .decorative-orb {
-    position: absolute; border-radius: 50%;
-    filter: blur(80px); opacity: 0.3; z-index: -1;
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: -1;
+    opacity: 0.4;
 }
-.orb-1 { width: 400px; height: 400px; top: -100px; right: -100px; background: var(--primary-glow); }
-.orb-2 { width: 600px; height: 600px; bottom: -200px; left: -200px; background: var(--warning-luminous); opacity: 0.15;}
 
-/* --- Layout Containers --- */
+.orb-1 { width: 500px; height: 500px; top: -100px; right: -50px; background: var(--primary-blue); }
+.orb-2 { width: 400px; height: 400px; bottom: -50px; left: -50px; background: var(--primary-cyan); }
+
+/* --- Containers --- */
 .view-container {
-    padding: 2rem; display: flex; flex-direction: column; align-items: center; width: 100%;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
 .full-height { min-height: 100vh; justify-content: center; }
 .hidden { display: none !important; }
-.mt-2 { margin-top: 1.5rem; }
-.dashboard-content { width: 100%; max-width: 1000px; display: flex; flex-direction: column; gap: 2rem; }
-.flex-end { display: flex; justify-content: flex-end; width: 100%; }
 
-/* --- Glassmorphism Cards & Panels --- */
-.glass-card, .glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-    border-radius: 16px;
-    border: var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    padding: 2.5rem;
-    transition: transform 0.2s, box-shadow 0.2s;
+/* --- Headers & Typography --- */
+.brand-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(to right, #fff, var(--text-slate));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
 }
 
-.glass-card:hover { transform: translateY(-3px); box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4); }
+.cyan-glow { color: var(--primary-cyan); text-shadow: 0 0 20px var(--accent-glow); }
+.cyan { color: var(--primary-cyan); }
 
-/* --- Auth Specifics --- */
-.auth-card { max-width: 480px; width: 100%; text-align: center; }
-.auth-card .tabs { justify-content: center; }
+h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; }
+h3 { font-size: 1.5rem; color: var(--primary-cyan); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.1em; }
+.text-luminous-muted { color: var(--text-slate); font-size: 1.1rem; max-width: 600px; }
+
+/* --- Glassmorphism Cards --- */
+.glass-card {
+    background: var(--glass-fill);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 3rem;
+    width: 100%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+    border-color: rgba(14, 165, 233, 0.3);
+    transform: translateY(-5px);
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+/* --- Auth Tabs --- */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    border-radius: 12px;
+}
+
+.tab {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-slate);
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.tab.active {
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* --- Form Elements --- */
+.form-group { margin-bottom: 1.5rem; width: 100%; text-align: left; }
+label { display: block; margin-bottom: 0.5rem; color: var(--text-slate); font-size: 0.9rem; font-weight: 500; }
+
+input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1rem;
+    color: white;
+    font-size: 1rem;
+    transition: var(--transition-smooth);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+/* --- Buttons --- */
+button {
+    cursor: pointer;
+    font-weight: 700;
+    border: none;
+    transition: var(--transition-smooth);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-luminous-primary {
+    background: var(--primary-blue);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    width: 100%;
+    font-size: 1.1rem;
+}
+
+.btn-luminous-primary:hover {
+    background: #1d4ed8;
+    box-shadow: 0 0 25px rgba(37, 99, 235, 0.4);
+}
+
+.btn-luminous-primary:disabled {
+    background: #1e293b;
+    color: #475569;
+    cursor: not-allowed;
+}
+
+.btn-luminous-secondary {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+}
+
+.btn-luminous-secondary:hover {
+    background: var(--glass-fill);
+    border-color: white;
+}
 
 /* --- Dashboard Specifics --- */
 .dashboard-header {
-    width: 100%; max-width: 1000px;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 1rem 2rem; margin-bottom: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
 }
-.full-bleed-title { text-align: center; margin: 2rem 0; }
-.large-section { width: 100%; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
-.actions-footer { display: flex; justify-content: center; width: 100%; margin-top: 2rem; padding-bottom: 2rem; }
 
-/* --- Typography (Luminous Dark Theme) --- */
-h1, h2, h3, h4, h5 { color: var(--text-main); margin-bottom: 0.75rem; font-weight: 700; }
-.full-bleed-title h1 { font-size: 3rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
-.full-bleed-title h1 span.cyan { color: var(--text-cyan); }
-.brand-title { color: var(--text-cyan); font-size: 2rem; margin-bottom: 0.5rem; }
-.subtitle { color: var(--text-luminous-muted); font-size: 1.1rem; margin-bottom: 2.5rem; font-weight: 300; }
-.text-luminous-muted { color: var(--text-luminous-muted); font-size: 1rem; margin-bottom: 1.5rem; font-weight: 300; }
-.luminous-glow { text-shadow: 0 0 10px rgba(59, 130, 246, 0.8); }
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
 
-/* --- Luminous State Colors --- */
-.status-luminous-warning { color: var(--warning-luminous); font-weight: bold; font-size: 1.1rem; }
-.big-number { font-size: 2.5rem; font-weight: 800; color: #ffffff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); }
+.big-number {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(to bottom, #fff, var(--primary-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-/* --- Metric & Prediction Styling --- */
-.metric-box { padding: 2rem; text-align: center; }
-.prediction-box { padding: 2rem; }
-.timeline-luminous { list-style: none; margin-top: 1rem; }
+.status-luminous-warning {
+    color: #fbbf24;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+/* --- Timeline & Solution Cards --- */
 .timeline-luminous li {
-    padding: 0.75rem 0; border-bottom: var(--glass-border);
-    display: flex; justify-content: space-between; align-items: center;
-    color: var(--text-luminous-muted); font-size: 1.05rem;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--glass-border);
 }
-.timeline-luminous li span { color: #ffffff; }
-.timeline-luminous li strong { color: var(--primary-luminous); font-size: 1.2rem; }
 
-/* --- Form Elements (Minimal Luminous) --- */
-.form-group { margin-bottom: 1.5rem; text-align: left;}
-label { display: block; margin-bottom: 0.6rem; color: #a1a1aa; font-weight: 500; font-size: 0.95rem;}
-input[type="email"], input[type="password"], input[type="text"], input[type="file"] {
-    width: 100%; padding: 1rem;
-    background: rgba(0, 0, 0, 0.2); border: var(--glass-border); border-radius: 8px;
-    color: #ffffff; font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s;
-}
-input:focus { outline: none; border-color: var(--primary-luminous); box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-
-/* File upload styling is basic, but functional. More detailed styling requires extra structure. */
-.upload-area { margin-bottom: 1rem; }
-
-/* Inline form for address */
-.inline-form { display: flex; gap: 1rem; padding: 1rem; }
-.inline-form input { flex: 1; padding: 0.75rem; }
-.inline-btn { width: auto; padding: 0.75rem 1.5rem; white-space: nowrap; }
-
-/* --- Buttons (Luminous & Subtle) --- */
-button { cursor: pointer; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; font-size: 1rem; transition: all 0.2s ease; outline: none; border: none;}
-
-.btn-luminous-primary {
-    background: linear-gradient(135deg, var(--primary-luminous) 0%, var(--primary-glow) 100%);
-    color: #ffffff; width: 100%; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-}
-.btn-luminous-primary:hover { box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6); }
-.btn-luminous-primary:disabled { background: #475569; box-shadow: none; cursor: not-allowed; }
-
-.btn-luminous-secondary {
-    background: transparent; color: #ffffff; border: var(--glass-border);
-}
-.btn-luminous-secondary:hover { background: rgba(255, 255, 255, 0.1); border-color: #ffffff; }
-
-.btn-subtle-danger {
-    background: transparent; color: var(--danger-subtle); border: 1px solid var(--danger-subtle); width: auto; font-size: 0.9rem; padding: 0.75rem 1.5rem;
-}
-.btn-subtle-danger:hover { background: rgba(153, 27, 27, 0.1); border-color: #ef4444; color: #ef4444; }
-
-/* --- Tabs (Deep Theme) --- */
-.tabs { display: flex; margin-bottom: 2rem; border-bottom: var(--glass-border); }
-.tab { flex: 1; background: none; color: var(--text-luminous-muted); border-radius: 0; padding: 1rem; font-weight: 600;}
-.tab.active { color: var(--primary-luminous); border-bottom: 3px solid var(--primary-luminous); margin-bottom: -1px; }
-
-/* --- Solution Cards (Inspired by featured works from image_1.png) --- */
 .luminous-solution-card {
-    display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem; margin-top: 1.25rem;
-    transition: background 0.2s;
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    border-left: 4px solid var(--primary-cyan);
 }
-.luminous-solution-card:hover { background: rgba(34, 211, 238, 0.05); }
-.card-icon { font-size: 2rem; color: var(--text-cyan); flex-shrink: 0;}
-.card-content h5 { margin-bottom: 0.25rem; color: var(--text-main); font-size: 1.2rem; }
-.card-content p { color: var(--text-luminous-muted); font-size: 0.95rem; font-weight: 300;}
-.solutions-header { font-size: 1.4rem; color: var(--text-main); margin: 2rem 0 1rem 0; font-weight: 600;}
+
+.card-icon {
+    font-size: 1.5rem;
+    color: var(--primary-cyan);
+}
+
+/* --- Clear Button (Footer) --- */
+.btn-subtle-danger {
+    margin-top: 4rem;
+    background: transparent;
+    color: #ef4444;
+    font-size: 0.9rem;
+    opacity: 0.6;
+}
+
+.btn-subtle-danger:hover { opacity: 1; }
