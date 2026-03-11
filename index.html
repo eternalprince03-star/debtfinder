@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt Resolve - Advanced Debt Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-bg">
+        <div class="decorative-orb orb-1"></div>
+        <div class="decorative-orb orb-2"></div>
+    </div>
+
+    <main id="auth-view" class="view-container full-height">
+        <div class="glass-card auth-card">
+            <h1 class="brand-title">Resolve Without Limits</h1>
+            <p class="subtitle">One Solution, Infinite Clarity.</p>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('login')">Log In</button>
+                <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+            </div>
+
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-luminous-primary" id="auth-btn">Log In</button>
+            </form>
+        </div>
+    </main>
+
+    <main id="dashboard-view" class="view-container hidden">
+        <header class="dashboard-header glass-panel">
+            <h2>Your Debt Dashboard</h2>
+            <button id="logout-btn" class="btn-luminous-secondary">Return to Sign In</button>
+        </header>
+
+        <div class="dashboard-content">
+            <section class="full-bleed-title">
+                <h1>Resolve Debt <span class="cyan">Faster, Smarter.</span></h1>
+            </section>
+
+            <section class="glass-card large-section" id="upload-section">
+                <h3>1. Clear Documentation</h3>
+                <p class="text-luminous-muted">Upload billing statements or loan docs. We decode the debt and status instantly.</p>
+                
+                <div class="upload-area">
+                    <input type="file" id="document-upload" accept=".pdf, .jpg, .png">
+                </div>
+                
+                <div class="flex-end mt-2">
+                    <button id="analyze-btn" class="btn-luminous-primary" disabled>Analyze and Proceed</button>
+                </div>
+                <div id="loading-spinner" class="hidden text-info luminous-glow">Analyzing document... please wait.</div>
+            </section>
+
+            <section class="glass-card hidden large-section" id="analysis-section">
+                <h3>2. Analysis & Growth</h3>
+                <div class="grid-2">
+                    <div class="metric-box glass-panel">
+                        <h4>Current Status</h4>
+                        <p id="debt-status" class="status-luminous-warning">Mitigation Advised</p>
+                    </div>
+                    <div class="metric-box glass-panel">
+                        <h4>Total Principal Debt</h4>
+                        <p id="debt-amount" class="big-number luminous-white">$0.00</p>
+                    </div>
+                </div>
+                
+                <div class="prediction-box glass-panel">
+                    <h4>Compound Growth Over Time (at 6.5%)</h4>
+                    <p class="text-luminous-muted">Forecasted debt growth if left unresolved:</p>
+                    <ul id="prediction-list" class="timeline-luminous">
+                        </ul>
+                </div>
+            </section>
+
+            <section class="glass-card hidden large-section" id="solutions-section">
+                <h3>3. Actionable Resolutions</h3>
+                <p class="text-luminous-muted">Enter your address for tailored state and federal mitigation options.</p>
+                
+                <form id="address-form" class="inline-form glass-panel">
+                    <input type="text" id="user-address" placeholder="e.g., 123 Main St, New York, NY" required>
+                    <button type="submit" class="btn-luminous-primary inline-btn">Explore</button>
+                </form>
+
+                <div id="actionable-solutions" class="hidden mt-2">
+                    <h4 class="solutions-header">Featured Opportunities</h4>
+                    
+                    <div class="luminous-solution-card glass-panel">
+                        <div class="card-icon cyan">✦</div>
+                        <div class="card-content">
+                            <h5>Public Service Loan Forgiveness (PSLF)</h5>
+                            <p>State-specific analysis indicates potential eligibility. Eliminates balance after 120 payments.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="luminous-solution-card glass-panel">
+                        <div class="card-icon cyan">✦</div>
+                        <div class="card-content">
+                            <h5>Income-Driven Repayment (IDR)</h5>
+                            <p>Mitigate costs by capping payments at 10% of discretionary income.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="actions-footer">
+                <button id="clear-btn" class="btn-subtle-danger">Clear All Data</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
