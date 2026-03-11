@@ -1,112 +1,164 @@
-// --- View Management ---
+// --- Supabase Configuration ---
+const SUPABASE_URL = 'https://dahwstpnxsumkxexpyla.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_eL52f21Lte7rvsLPfY2-3w_PmLaIIDj';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// --- State Management ---
+let authMode = 'login';
+
+// --- DOM Elements ---
 const authView = document.getElementById('auth-view');
 const dashboardView = document.getElementById('dashboard-view');
 const authForm = document.getElementById('auth-form');
 const logoutBtn = document.getElementById('logout-btn');
-
-// --- Dashboard Elements ---
-const fileInput = document.getElementById('document-upload');
 const analyzeBtn = document.getElementById('analyze-btn');
-const loadingSpinner = document.getElementById('loading-spinner');
-const analysisSection = document.getElementById('analysis-section');
-const solutionsSection = document.getElementById('solutions-section');
+const fileInput = document.getElementById('document-upload');
 const addressForm = document.getElementById('address-form');
-const actionableSolutions = document.getElementById('actionable-solutions');
 const clearBtn = document.getElementById('clear-btn');
 
-// --- Tab Switching Logic (Login / Sign up) ---
-function switchTab(mode) {
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    event.target.classList.add('active');
+// --- 1. Authentication Logic ---
+window.switchTab = (mode) => {
+    authMode = mode;
+    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+    document.getElementById('auth-btn').textContent = mode === 'login' ? 'Log In' : 'Sign Up';
+};
+
+authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const { data, error } = (authMode === 'signup') 
+        ? await _supabase.auth.signUp({ email, password })
+        : await _supabase.auth.signInWithPassword({ email, password });
+
+    if (error) alert(`Auth Error: ${error.message}`);
+    else checkSession();
+});
+
+logoutBtn.addEventListener('click', async () => {
+    await _supabase.auth.signOut();
+    checkSession();
+});
+
+// --- 2. Database & Session Persistence ---
+async function checkSession() {
+    const { data: { session } } = await _supabase.auth.getSession();
     
-    const btn = document.getElementById('auth-btn');
-    btn.textContent = mode === 'login' ? 'Log In' : 'Sign Up';
+    if (session) {
+        authView.classList.add('hidden');
+        dashboardView.classList.remove('hidden');
+        fetchUserData(session.user.id);
+    } else {
+        authView.classList.remove('hidden');
+        dashboardView.classList.add('hidden');
+    }
 }
 
-// --- Authentication Simulation ---
-authForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    // Simulate successful login/signup
-    authView.classList.add('hidden');
-    dashboardView.classList.remove('hidden');
-    authForm.reset();
-});
+async function fetchUserData(userId) {
+    const { data, error } = await _supabase
+        .from('user_debt_records')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-logoutBtn.addEventListener('click', () => {
-    dashboardView.classList.add('hidden');
-    authView.classList.remove('hidden');
-    resetDashboard(); // Clear data on logout for privacy
-});
+    if (data) {
+        if (data.debt_amount) showDebtAnalysis(data.debt_amount, data.debt_status);
+        if (data.user_address) showSolutions(data.user_address);
+    }
+}
 
-// --- File Upload & Analysis Simulation ---
+async function upsertUserData(updates) {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const { error } = await _supabase
+        .from('user_debt_records')
+        .upsert({ id: user.id, ...updates });
+
+    if (error) console.error("Error saving to DB:", error.message);
+}
+
+// --- 3. Functional Features ---
 fileInput.addEventListener('change', () => {
     analyzeBtn.disabled = fileInput.files.length === 0;
 });
 
 analyzeBtn.addEventListener('click', () => {
-    // Correcting a small bug from before: analyzeBtn should hide, not just disable.
+    document.getElementById('loading-spinner').classList.remove('hidden');
     analyzeBtn.disabled = true;
-    loadingSpinner.classList.remove('hidden');
 
-    // Simulate backend OCR/Processing delay (2 seconds)
-    setTimeout(() => {
-        analyzeBtn.classList.add('hidden'); // Fully hide after analyze
-        loadingSpinner.classList.add('hidden');
-        analysisSection.classList.remove('hidden');
-        solutionsSection.classList.remove('hidden');
+    // Simulate AI analysis delay
+    setTimeout(async () => {
+        const principal = 42500; // Simulated data from document
+        const status = 'Active / Interest Accruing';
         
-        // Mock extracted data (Status updated for higher depth tone)
-        populateDebtData(35400, 0.065, 'Mitigation Advised'); // $35,400 debt at 6.5% interest
+        await upsertUserData({ debt_amount: principal, debt_status: status });
+        
+        document.getElementById('loading-spinner').classList.add('hidden');
+        showDebtAnalysis(principal, status);
     }, 2000);
 });
 
-// --- Debt Math & UI Population ---
-function populateDebtData(principal, interestRate, statusText) {
-    // Format Currency
+function showDebtAnalysis(principal, status) {
+    document.getElementById('analysis-section').classList.remove('hidden');
+    document.getElementById('solutions-section').classList.remove('hidden');
+    document.getElementById('upload-section').classList.add('hidden'); // Clean UI after upload
+
     const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-    
     document.getElementById('debt-amount').textContent = formatter.format(principal);
-    document.getElementById('debt-status').textContent = statusText;
-    
-    // Generate Predictions (Compound Interest for next 5 years)
-    const predictionList = document.getElementById('prediction-list');
-    predictionList.innerHTML = ''; // Clear old data
-    
-    const currentYear = new Date().getFullYear();
-    
+    document.getElementById('debt-status').textContent = status;
+
+    // Compound Interest Prediction Logic
+    const list = document.getElementById('prediction-list');
+    list.innerHTML = '';
+    const rate = 0.065; // 6.5% standard
     for (let i = 1; i <= 5; i++) {
-        // Simple compound interest formula: A = P(1 + r)^t
-        let futureAmount = principal * Math.pow((1 + interestRate), i);
-        
+        let futureValue = principal * Math.pow((1 + rate), i);
         let li = document.createElement('li');
-        li.innerHTML = `<span>Year ${currentYear + i}</span> <strong>${formatter.format(futureAmount)}</strong>`;
-        predictionList.appendChild(li);
+        li.innerHTML = `<span>Year ${new Date().getFullYear() + i}</span> <strong>${formatter.format(futureValue)}</strong>`;
+        list.appendChild(li);
     }
 }
 
-// --- Address & Solutions Simulation ---
-addressForm.addEventListener('submit', (e) => {
+addressForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // Once address is entered, reveal the customized solutions
-    actionableSolutions.classList.remove('hidden');
+    const addr = document.getElementById('user-address').value;
+    await upsertUserData({ user_address: addr });
+    showSolutions(addr);
 });
 
-// --- Clear Information ---
-function resetDashboard() {
-    fileInput.value = '';
-    analyzeBtn.disabled = true;
-    analyzeBtn.classList.remove('hidden');
+function showSolutions(address) {
+    document.getElementById('user-address').value = address;
+    const solList = document.getElementById('solutions-list');
+    document.getElementById('actionable-solutions').classList.remove('hidden');
     
-    analysisSection.classList.add('hidden');
-    solutionsSection.classList.add('hidden');
-    actionableSolutions.classList.add('hidden');
-    
-    document.getElementById('user-address').value = '';
+    // Customized response based on presence of address
+    solList.innerHTML = `
+        <div class="luminous-solution-card glass-panel">
+            <div class="card-icon cyan">✦</div>
+            <div class="card-content">
+                <h5>Location-Based Grant Search</h5>
+                <p>Analyzing local mitigation options for: ${address}</p>
+            </div>
+        </div>
+        <div class="luminous-solution-card glass-panel">
+            <div class="card-icon cyan">✦</div>
+            <div class="card-content">
+                <h5>Federal Consolidation</h5>
+                <p>Standard federal options to mitigate current interest growth.</p>
+            </div>
+        </div>
+    `;
 }
 
-clearBtn.addEventListener('click', () => {
-    if(confirm('Are you sure you want to clear all your data? This cannot be undone.')) {
-        resetDashboard();
+// --- 4. Global Reset ---
+clearBtn.addEventListener('click', async () => {
+    if (confirm("This will permanently delete your records from the database. Proceed?")) {
+        const { data: { user } } = await _supabase.auth.getUser();
+        await _supabase.from('user_debt_records').delete().eq('id', user.id);
+        location.reload(); // Refresh to clear UI state
     }
 });
+
+// Start application
+checkSession();
