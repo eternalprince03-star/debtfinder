@@ -119,6 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addressForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        alert("The button was clicked! Attempting to connect to Supabase...");
+        
         const addr = document.getElementById('user-address').value;
         await upsertUserData({ user_address: addr });
         showSolutions(addr);
