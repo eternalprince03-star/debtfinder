@@ -6,9 +6,9 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // --- State Management ---
 let authMode = 'login';
 
-// --- Initialization ---
+// Wrap all DOM-dependent code in a Content Loaded listener
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
+    // --- DOM Elements ---
     const authView = document.getElementById('auth-view');
     const dashboardView = document.getElementById('dashboard-view');
     const authForm = document.getElementById('auth-form');
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
 
-        // Visual feedback
+        // Visual feedback to prevent multiple clicks
         authBtn.innerText = "Processing...";
         authBtn.disabled = true;
 
@@ -41,13 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
             : await _supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
+            // Handle common errors like "User already registered" or "Invalid credentials"
             alert(`Auth Error: ${error.message}`);
             authBtn.innerText = authMode === 'signup' ? 'Sign Up' : 'Log In';
             authBtn.disabled = false;
         } else {
-            // SUCCESS LOGIC
+            // SUCCESS LOGIC: If signing up, notify about email confirmation
             if (authMode === 'signup' && !data.session) {
-                alert("Sign-up successful! Please check your email for a confirmation link to activate your account.");
+                alert("Sign-up successful! Please check your email inbox for a confirmation link to activate your account.");
                 authBtn.innerText = 'Sign Up';
                 authBtn.disabled = false;
             } else {
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checkSession();
     });
 
-    // --- 2. Session & Database ---
+    // --- 2. Session & Database Sync ---
     async function checkSession() {
         const { data: { session } } = await _supabase.auth.getSession();
         
@@ -76,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchUserData(userId) {
-        const { data } = await _supabase
+        const { data, error } = await _supabase
             .from('user_debt_records')
             .select('*')
             .eq('id', userId)
@@ -90,16 +91,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function upsertUserData(updates) {
         const { data: { user } } = await _supabase.auth.getUser();
-        if (!user) return;
+        
+        // Safety Check: Prevent crash if user session expired
+        if (!user) {
+            console.error("No user found for upsert. Please log in again.");
+            return;
+        }
 
         const { error } = await _supabase
             .from('user_debt_records')
-            .upsert({ id: user.id, ...updates });
+            .upsert(
+                { id: user.id, ...updates, updated_at: new Date() }, 
+                { onConflict: 'id' } // Mirroring the SQL Primary Key logic
+            );
 
-        if (error) console.error("Error saving to DB:", error.message);
+        if (error) console.error("Database Sync Error:", error.message);
     }
 
-    // --- 3. UI Features ---
+    // --- 3. UI Interactions ---
     fileInput.addEventListener('change', () => {
         analyzeBtn.disabled = fileInput.files.length === 0;
     });
@@ -109,9 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
         analyzeBtn.disabled = true;
 
         setTimeout(async () => {
-            const principal = 42500; 
-            const status = 'Active / Interest Accruing';
+            const principal = 45000; 
+            const status = 'Standard Repayment Plan';
+            
             await upsertUserData({ debt_amount: principal, debt_status: status });
+            
             document.getElementById('loading-spinner').classList.add('hidden');
             showDebtAnalysis(principal, status);
         }, 2000);
@@ -119,14 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addressForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert("The button was clicked! Attempting to connect to Supabase...");
-        
         const addr = document.getElementById('user-address').value;
         await upsertUserData({ user_address: addr });
         showSolutions(addr);
     });
 
-    // --- 4. Global Reset (With Safety Check) ---
+    // --- 4. Global Reset ---
     clearBtn.addEventListener('click', async () => {
         const { data: { user } } = await _supabase.auth.getUser();
         
@@ -135,16 +144,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (confirm("This will permanently delete your records. Proceed?")) {
-            await _supabase.from('user_debt_records').delete().eq('id', user.id);
-            location.reload();
+        if (confirm("Permanently wipe your data from the cloud? This cannot be undone.")) {
+            const { error } = await _supabase.from('user_debt_records').delete().eq('id', user.id);
+            if (!error) location.reload();
+            else alert("Error deleting records: " + error.message);
         }
     });
 
     function showDebtAnalysis(principal, status) {
+        document.getElementById('upload-section').classList.add('hidden');
         document.getElementById('analysis-section').classList.remove('hidden');
         document.getElementById('solutions-section').classList.remove('hidden');
-        document.getElementById('upload-section').classList.add('hidden');
 
         const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
         document.getElementById('debt-amount').textContent = formatter.format(principal);
@@ -168,12 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card-icon cyan">✦</div>
                 <div class="card-content">
                     <h5>Localized Mitigation Program</h5>
-                    <p>Found potential state-level matches for: ${address}</p>
+                    <p>Scanning state-specific grants for: ${address}</p>
                 </div>
             </div>
         `;
     }
 
-    // Run initial check
+    // Initial check on load
     checkSession();
 });
