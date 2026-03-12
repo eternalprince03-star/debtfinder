@@ -3,105 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debt Resolve | Infinite Clarity</title>
+    <title>DebtPath | Comprehensive Resolution</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="main-bg">
-        <div class="decorative-orb orb-1"></div>
-        <div class="decorative-orb orb-2"></div>
-    </div>
 
-    <main id="auth-view" class="view-container full-height">
+    <section id="view-auth" class="view-container">
         <div class="glass-card auth-card">
-            <h1 class="brand-title">Resolve Without Limits</h1>
-            <p class="subtitle">Securely track and mitigate your student debt.</p>
-            
+            <h1 class="cyan-glow">DebtPath</h1>
             <div class="tabs">
-                <button class="tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
-                <button class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+                <button class="tab active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
+                <button class="tab" id="tab-signup" onclick="switchAuthMode('signup')">Sign Up</button>
             </div>
-
             <form id="auth-form">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" required placeholder="you@university.edu">
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required placeholder="••••••••">
-                </div>
-                <button type="submit" class="btn-luminous-primary" id="auth-btn">Log In</button>
+                <input type="email" id="email" placeholder="Email Address" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit" id="auth-btn" class="btn-luminous">Continue</button>
             </form>
+            <p class="note">Note: Two-step verification will be sent to your email.</p>
         </div>
-    </main>
+    </section>
 
-    <main id="dashboard-view" class="view-container hidden">
-        <header class="dashboard-header glass-panel">
-            <h2 class="cyan-glow">Debt Intelligence</h2>
-            <button id="logout-btn" class="btn-luminous-secondary">Return to Sign In</button>
-        </header>
-
-        <div class="dashboard-content">
-            <section class="full-bleed-title">
-                <h1>Manage Debt <span class="cyan">with Precision.</span></h1>
-            </section>
-
-            <section class="glass-card large-section" id="upload-section">
-                <h3>1. Debt Documentation</h3>
-                <p class="text-luminous-muted">Upload your latest college financial records to start the analysis.</p>
-                <div class="upload-area">
-                    <input type="file" id="document-upload" accept=".pdf, .jpg, .png">
-                </div>
-                <div class="flex-end mt-2">
-                    <button id="analyze-btn" class="btn-luminous-primary" disabled>Analyze Records</button>
-                </div>
-                <div id="loading-spinner" class="hidden text-info luminous-glow">Parsing document metadata...</div>
-            </section>
-
-            <section class="glass-card hidden large-section" id="analysis-section">
-                <h3>2. Financial Outlook</h3>
-                <div class="grid-2">
-                    <div class="metric-box glass-panel">
-                        <h4>Account Status</h4>
-                        <p id="debt-status" class="status-luminous-warning">Pending Analysis</p>
-                    </div>
-                    <div class="metric-box glass-panel">
-                        <h4>Total Principal</h4>
-                        <p id="debt-amount" class="big-number">$0.00</p>
-                    </div>
-                </div>
-                
-                <div class="prediction-box glass-panel">
-                    <h4>Future Interest Forecast</h4>
-                    <p class="text-luminous-muted">Projected growth based on standard compound interest rates.</p>
-                    <ul id="prediction-list" class="timeline-luminous">
-                        </ul>
-                </div>
-            </section>
-
-            <section class="glass-card hidden large-section" id="solutions-section">
-                <h3>3. Resolution Roadmap</h3>
-                <p class="text-luminous-muted">Enter your current address to unlock location-based mitigation programs.</p>
-                
-                <form id="address-form" class="inline-form glass-panel">
-                    <input type="text" id="user-address" placeholder="Address, City, State, Zip" required>
-                    <button type="submit" class="btn-luminous-primary inline-btn">Save & Analyze</button>
-                </form>
-
-                <div id="actionable-solutions" class="hidden mt-2">
-                    <h4 class="solutions-header">Mitigation Options</h4>
-                    <div id="solutions-list">
-                        </div>
-                </div>
-            </section>
-
-            <div class="actions-footer">
-                <button id="clear-btn" class="btn-subtle-danger">Clear All Stored Records</button>
+    <section id="view-edu" class="view-container hidden">
+        <div class="glass-card content-card">
+            <h2 class="cyan-glow">Understanding Your Debt</h2>
+            <div class="edu-content">
+                <p>Student loan debt typically consists of two parts: the <strong>Principal</strong> (the amount you borrowed) and <strong>Interest</strong> (the cost of borrowing).</p>
+                <p>Interest accrues daily. If not managed, "capitalized interest" can cause your balance to grow even if you aren't making active purchases.</p>
             </div>
+            <button onclick="navigateTo('view-analysis')" class="btn-luminous">Next: Analyze Records</button>
         </div>
-    </main>
+    </section>
+
+    <section id="view-analysis" class="view-container hidden">
+        <div class="glass-card content-card">
+            <h2 class="cyan-glow">Debt Analysis</h2>
+            <div class="upload-zone" id="drop-zone">
+                <p>Drag & drop college financial documentation here</p>
+                <input type="file" id="file-upload" hidden>
+            </div>
+            
+            <div id="results-display" class="hidden">
+                <div class="stats-grid">
+                    <div class="stat"><span>Current Principal:</span> <span id="principal-val">$0.00</span></div>
+                    <div class="stat"><span>Status:</span> <span id="status-tag" class="tag">Unprocessed</span></div>
+                </div>
+                <div class="projection-box">
+                    <h3>12-Month Interest Projection</h3>
+                    <p id="projection-val" class="danger-text">$0.00</p>
+                </div>
+            </div>
+
+            <button id="analyze-btn" class="btn-luminous full-width">Analyze Documentation</button>
+            <button id="to-steps-btn" class="btn-luminous full-width hidden">Next: View Action Steps</button>
+        </div>
+    </section>
+
+    <section id="view-steps" class="view-container hidden">
+        <div class="glass-card content-card">
+            <h2 class="cyan-glow">Your Roadmap</h2>
+            <div id="action-list">
+                </div>
+            <button onclick="location.reload()" class="btn-outline">Restart Analysis</button>
+        </div>
+    </section>
 
     <script src="script.js"></script>
 </body>
